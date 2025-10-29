@@ -1,29 +1,41 @@
-name: Publish to GitHub Packages
+name: Publish SNAPSHOT to GitHub Packages
 
 on:
   push:
     branches:
-      - main
+      - main  # deploy on each commit to main
 
 jobs:
-  build-and-publish:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up Java 21 and configure Maven settings for GitHub Packages
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
-          # this will write credentials to settings.xml using this server-id
-          server-id: github
-          server-username: ${{ github.actor }}
-          server-password: ${{ secrets.GITHUB_TOKEN }}
-          # set settings-path to workspace so mvn picks it up
-          settings-path: ${{ github.workspace }}
+          cache: 'maven'
 
-      - name: Build and deploy
+      - name: Configure Maven settings
         run: |
-          mvn -B -DskipTests deploy
+          mkdir -p ~/.m2
+          cat <<EOF > ~/.m2/settings.xml
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+            <servers>
+              <server>
+                <id>github</id>
+                <username>h2a26</username>
+                <password>${{ secrets.PAT_CLASSIC }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      - name: Build and Deploy SNAPSHOT
+        run: mvn clean deploy -DskipTests

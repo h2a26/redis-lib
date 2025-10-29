@@ -10,9 +10,18 @@
 	</parent>
 	<groupId>org.hein</groupId>
 	<artifactId>redis-lib</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>redis-lib</name>
 	<description>redis-lib</description>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/h2a26/redis-lib</url>
+		</repository>
+	</distributionManagement>
+
 	<url/>
 	<licenses>
 		<license/>

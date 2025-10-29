@@ -1,0 +1,29 @@
+name: Publish to GitHub Packages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21 and configure Maven settings for GitHub Packages
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          # this will write credentials to settings.xml using this server-id
+          server-id: github
+          server-username: ${{ github.actor }}
+          server-password: ${{ secrets.GITHUB_TOKEN }}
+          # set settings-path to workspace so mvn picks it up
+          settings-path: ${{ github.workspace }}
+
+      - name: Build and deploy
+        run: |
+          mvn -B -DskipTests deploy
